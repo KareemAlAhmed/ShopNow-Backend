@@ -1,6 +1,13 @@
 package com.example.ShopNow.models;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.*;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -13,6 +20,36 @@ public class User {
     private String email;
     private String password;
     private String phone;
+
+
+
+    @Convert(converter = CartItemListConverter.class)
+    @Column(columnDefinition = "TEXT")
+    private List<CartItem> cart = new ArrayList<>();
+
+    @Convert(converter = CartItemListConverter.class)
+    @Column(columnDefinition = "TEXT")
+    private List<CartItem> wishlist = new ArrayList<>();
+
+    public List<CartItem> getCart() {
+        return cart;
+    }
+
+    public void setCart(List<CartItem> cart) {
+        this.cart = cart;
+    }
+
+    public List<CartItem> getWishlist() {
+        return wishlist;
+    }
+
+    public void setWishlist(List<CartItem> wishlist) {
+        this.wishlist = wishlist;
+    }
+
+
+
+
     public String getPhone() {
         return phone;
     }
@@ -59,3 +96,4 @@ public class User {
 
 
 }
+
