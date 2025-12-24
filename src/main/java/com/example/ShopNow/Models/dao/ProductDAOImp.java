@@ -86,7 +86,7 @@ public class ProductDAOImp implements ProductDAO{
 
     public List<Product> searchProds(String search){
         System.out.println(search);
-        List<Product> prods=entityManager.createQuery("FROM Product WHERE name LIKE :searchC").setParameter("searchC", "%" + search + "%").getResultList();
+        List<Product> prods=entityManager.createQuery("FROM Product WHERE name LIKE :searchC  Or description LIKE :searchC").setParameter("searchC", "%" + search + "%").getResultList();
         return prods;
     }
 }

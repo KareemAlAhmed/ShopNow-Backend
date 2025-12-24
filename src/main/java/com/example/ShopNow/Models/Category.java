@@ -1,9 +1,8 @@
 package com.example.ShopNow.Models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+
+import java.util.List;
 
 @Entity
 public class Category {
@@ -12,6 +11,19 @@ public class Category {
     private int id;
 
     public String name;
+
+    @OneToMany(mappedBy = "category") // "parent" refers to the field in ChildEntity
+    private List<Subcategory> subCats;
+
+    public List<Subcategory> getSubcategory() {
+        return subCats;
+    }
+
+    public void setSubcategory(List<Subcategory> subCats) {
+        this.subCats = subCats;
+    }
+
+
     public int getId() {
         return id;
     }

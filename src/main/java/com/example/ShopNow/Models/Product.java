@@ -60,6 +60,15 @@ public class Product {
     @OneToMany(mappedBy = "product") // "parent" refers to the field in ChildEntity
     private List<Review> reviews;
 
+    public float getReviewRates() {
+        return reviewRates;
+    }
+
+    public void setReviewRates(float reviewRates) {
+        this.reviewRates = reviewRates;
+    }
+
+    private float reviewRates;
     public List<Review> getReviews() {
         return reviews;
     }

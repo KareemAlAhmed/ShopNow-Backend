@@ -51,6 +51,7 @@ public class TrafficController {
         response.setStatus(HttpStatus.NOT_FOUND.value());
         response.setMsg(exc.getMessage());
         response.setTimestamps(LocalDateTime.now());
+
         return new ResponseEntity<>(response,HttpStatus.NOT_FOUND);
     }
 }

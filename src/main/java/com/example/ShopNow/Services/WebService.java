@@ -53,6 +53,7 @@ public class WebService {
     public void loadProductsData() throws IOException {
         categoryDAO.loadAllCat();
         productDAO.loadAllProducts();
+        categoryDAO.loadAllSubcategories();
     }
     public ResponseEntity<?> getProductById(int id) throws ProductNotFoundException {
         Product prod=productDAO.getProdById(id);
@@ -264,7 +265,6 @@ public class WebService {
         }
 
     }
-
     public ResponseEntity<?> searchForProds(String search){
         List<Product> prods=productDAO.searchProds(search);
         return ResponseEntity.ok(Map.of(
@@ -274,6 +274,9 @@ public class WebService {
     }
 
     //=========Review================
+    public  double floorToNearestHalf(double number) {
+        return Math.floor(number * 2) / 2.0;
+    }
     public ResponseEntity<?> createReview(Review review,int userId,int prodId){
         User foundUser=userDAO.getUserById(userId);
         if(foundUser == null){
@@ -286,11 +289,26 @@ public class WebService {
         review.setUser(foundUser);
         review.setProduct(prod);
         review.setCreatedAt(LocalDateTime.now());
+
+
+        float prodRevRate=prod.getReviewRates();
+        float newRate=0;
+
+        if(prodRevRate == 0){
+            newRate=review.getRating();
+        }else{
+            newRate=(prodRevRate * prod.getReviews().size() + review.getRating()) / (prod.getReviews().size() + 1);
+        }
+
+
+        prod.setReviewRates((float) floorToNearestHalf(newRate));
+        productDAO.updateProduct(prod);
         reviewRepository.save(review);
 
         return ResponseEntity.ok(Map.of(
                 "status", "success",
-                "review",review
+                "review",review,
+                "prodNewRate",(float) floorToNearestHalf(newRate)
                 ));
     }
 
@@ -381,4 +399,10 @@ public class WebService {
                 "status", "success",
                 "discount",discount));
     }
+
+    //===========Categories================
+    public List<Category> getAllCate(){
+        return categoryDAO.getAllCats();
+    }
 }
+
