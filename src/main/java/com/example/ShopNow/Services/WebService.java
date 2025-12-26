@@ -76,7 +76,9 @@ public class WebService {
         ));
     }
 
-
+    public void upDatabase(){
+        productDAO.upDatabase();
+    }
 
 
     //===========User==========================
@@ -273,6 +275,13 @@ public class WebService {
                 "recordsFound",prods.size()));
     }
 
+    public ResponseEntity<?> searchForProdsByFiler(String filter,String value){
+        List<Product> prods=productDAO.searchForProdsByFiler(filter,value);
+        return ResponseEntity.ok(Map.of(
+                "status", "success",
+                "prods",prods,
+                "recordsFound",prods.size()));
+    }
     //=========Review================
     public  double floorToNearestHalf(double number) {
         return Math.floor(number * 2) / 2.0;

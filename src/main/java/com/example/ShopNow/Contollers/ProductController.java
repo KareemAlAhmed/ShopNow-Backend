@@ -36,13 +36,19 @@ public class ProductController {
     public void loadAllData() throws IOException {
         webService.loadProductsData();
     }
-
-    @GetMapping("/search")
-    public ResponseEntity<?> searchForProds(@RequestParam("search") String search){
-
-        return webService.searchForProds(search);
+    @PostMapping("/updateProdsDatabase")
+    public void upDatabase() throws IOException {
+        webService.upDatabase();
     }
+    @GetMapping("/search")
+    public ResponseEntity<?> searchForProds(@RequestParam(value = "search", required = false) String search,@RequestParam(value = "filter", required = false) String filter,@RequestParam(value = "value", required = false) String value){
+        if(filter == null){
+            return webService.searchForProds(search);
+        }else{
+            return webService.searchForProdsByFiler(filter,value);
+        }
 
+    }
     @GetMapping("/cats")
     public ResponseEntity<?> getCats(){
         return ResponseEntity.ok(Map.of(

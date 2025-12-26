@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.*;
 @Repository
 public class ProductDAOImp implements ProductDAO{
@@ -39,6 +40,7 @@ public class ProductDAOImp implements ProductDAO{
             allProds.addAll(prods);
         }
         for(Product prod: allProds){
+            prod.setCreatedAt(LocalDateTime.now());
             entityManager.persist(prod);
         }
         return  allProds;
@@ -85,8 +87,82 @@ public class ProductDAOImp implements ProductDAO{
 
 
     public List<Product> searchProds(String search){
-        System.out.println(search);
         List<Product> prods=entityManager.createQuery("FROM Product WHERE name LIKE :searchC  Or description LIKE :searchC").setParameter("searchC", "%" + search + "%").getResultList();
         return prods;
+    }
+
+    public <T> List<T> shuffleList(List<T> list) {
+        List<T> shuffled = new ArrayList<>(list);
+        Random random = new Random();
+
+        for (int i = shuffled.size() - 1; i > 0; i--) {
+            int j = random.nextInt(i + 1);
+            // Swap elements
+            T temp = shuffled.get(i);
+            shuffled.set(i, shuffled.get(j));
+            shuffled.set(j, temp);
+        }
+
+        return shuffled;
+    }
+
+
+    public List<Product> searchForProdsByFiler(String filter,String value){
+        List<Product> prods;
+        if(filter.equals("category")){
+            prods=entityManager.createQuery("FROM Product WHERE categoryName = :search").setParameter("search",value).getResultList();
+
+        } else if (filter.equals("price")) {
+            String[] priceRange = value.split("-");
+            Double minPrice=Double.parseDouble(priceRange[0]) ;
+            Double maxPrice=Double.parseDouble(priceRange[1]);
+            String jpql = "FROM Product p " +
+                    "WHERE CAST(REPLACE(p.price, ',', '') AS double) >= :minP " +
+                    "AND CAST(REPLACE(p.price, ',', '') AS double) <= :maxP";
+            prods=entityManager.createQuery(jpql ).setParameter("minP",minPrice).setParameter("maxP",maxPrice).getResultList();
+
+        }else if (filter.equals("brand")) {
+            prods=entityManager.createQuery("FROM Product WHERE brandName = :brand").setParameter("brand",value).getResultList();
+        }else if (filter.equals("popular")) {
+            prods=entityManager.createQuery("FROM Product WHERE reviewRates >= :rate").setParameter("rate",2.0).getResultList();
+        }else if (filter.equals("sales")) {
+            prods=entityManager.createQuery("FROM Product WHERE newPrice IS NOT NULL").getResultList();
+        }else if (filter.equals("bestSeller")) {
+            String jpql = "FROM Product p " +
+                    "WHERE CAST(REPLACE(p.quantity, ',', '') AS integer) <= 5 ";
+            prods=entityManager.createQuery(jpql ).getResultList();
+        }else if (filter.equals("new-arrivals")) {
+            LocalDateTime threeWeeksAgo = LocalDateTime.now().minusWeeks(4);
+            String jpql = "FROM Product p " +
+                    "WHERE p.createdAt >= :threeWeeksAgo " +
+                    "ORDER BY p.createdAt DESC";
+
+            prods = entityManager.createQuery(jpql, Product.class)
+                    .setParameter("threeWeeksAgo", threeWeeksAgo )
+                    .getResultList();
+        }else if (filter.equals("all")) {
+            prods=entityManager.createQuery("FROM Product").getResultList();
+            Collections.shuffle(prods);
+        }else{
+            prods=new ArrayList<>();
+        }
+        return prods;
+    }
+    @Transactional
+    public  void  upDatabase(){
+        List<Product> allProds=entityManager.createQuery("FROM Product").getResultList();
+        for(int i =0;i<allProds.size();i++){
+            if(i <= 100){
+                allProds.get(i).setCreatedAt(LocalDateTime.now().minusMonths(3));
+            } else if (i>100 && i<=200) {
+                allProds.get(i).setCreatedAt(LocalDateTime.now().minusMonths(2));
+            }
+            else if (i>100 && i<=300) {
+                allProds.get(i).setCreatedAt(LocalDateTime.now().minusMonths(1));
+            }else{
+                allProds.get(i).setCreatedAt(LocalDateTime.now().minusWeeks(3));
+            }
+            entityManager.merge(allProds.get(i));
+        }
     }
 }

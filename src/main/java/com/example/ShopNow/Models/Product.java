@@ -60,6 +60,17 @@ public class Product {
     @OneToMany(mappedBy = "product") // "parent" refers to the field in ChildEntity
     private List<Review> reviews;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createdAt;
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
     public float getReviewRates() {
         return reviewRates;
     }
