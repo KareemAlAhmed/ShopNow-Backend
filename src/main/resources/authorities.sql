@@ -7,6 +7,10 @@ CREATE TABLE users (
     funds DOUBLE DEFAULT 0,
 	cart TEXT NULL,
     wishlist TEXT,
+    reviewRates FLOAT,
+    sellingProds TEXT NULL,
+    prodReviewed TEXT NULL,
+    isVendor tinyint ,
     enabled tinyint NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -23,9 +27,9 @@ CREATE TABLE authorities (
 #CREATE UNIQUE INDEX ix_auth_username ON authorities (username, authority);
 
 INSERT INTO users
+(username, password, email, phone, funds, cart, wishlist, reviewRates, sellingProds, prodReviewed, is_vendor, enabled)
 VALUES
-(1,"Karim","{noop}81258136","karimahmad@gmail.com","81258136",999999.99,"[]","[]",1);
-
+("Karim", "{noop}81258136", "karimahmad@gmail.com", "81258136", 999999.99, "[]", "[]", 0.0, "[]", "[]", 0, 1);
 INSERT INTO authorities
 VALUES
 ("Karim","ROLE_ADMIN");

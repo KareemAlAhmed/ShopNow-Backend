@@ -1,17 +1,14 @@
 package com.example.ShopNow.Contollers;
 
-import com.example.ShopNow.Exceptions.UserNotFoundException;
 import com.example.ShopNow.Models.Review;
 import com.example.ShopNow.Models.User;
 import com.example.ShopNow.Models.dao.UserDAO;
 import com.example.ShopNow.Services.WebService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/user")
@@ -26,7 +23,10 @@ public class UserController {
     @GetMapping("/get/{id}")
     public ResponseEntity<?> getUser(@PathVariable int id) {
         return webService.getUser("id",id);
-
+    }
+    @GetMapping("/get/byField")
+    public ResponseEntity<?> getUser(@RequestParam("field") String field,@RequestParam("value") Object value) {
+        return webService.getUser(field,value);
     }
     @PostMapping("/create")
     public ResponseEntity<?> addUser(@RequestBody User user){
@@ -43,6 +43,10 @@ public class UserController {
         return webService.getAllUser();
     }
 
+    @GetMapping("/getAll/secured")
+    public List<UserDAO.UserResponseDTO> getUsersSecured() {
+        return webService.getUsersSecured();
+    }
     @PostMapping("/saveCartWish")
     public ResponseEntity<?> saveCartWish(@RequestBody User user){
         return webService.updateCartWish(user);
@@ -58,7 +62,7 @@ public class UserController {
         return webService.updateUseData(user,pass);
     }
     @PostMapping("/createReview")
-    public ResponseEntity<?> createrReview(@RequestBody Review review,@RequestParam("userId") int userId,@RequestParam("prodId") int prodId){
-        return webService.createReview(review,userId,prodId);
+    public ResponseEntity<?> createrReview(@RequestBody Review review,@RequestParam("userId") int userId,@RequestParam("prodId") int prodId,@RequestParam("sellerId") int sellerId){
+        return webService.createReview(review,userId,prodId,sellerId);
     }
 }

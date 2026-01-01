@@ -17,8 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import com.example.ShopNow.Repositories.PurchaseRepository;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -189,6 +187,9 @@ public class WebService {
     public List<User> getAllUser(){
         return userDAO.getAllUser();
     }
+    public List<UserDAO.UserResponseDTO> getUsersSecured(){
+        return userDAO.getUsersSecured();
+    }
     public ResponseEntity<?> getUser(String userField, Object data){
         if(userField.equals("email")){
             try{
@@ -200,6 +201,18 @@ public class WebService {
             }catch (Exception e){
                 throw new UserNotFoundException("User Doesnt Exist!");
             }
+        }else if (userField.equals("username")) {
+            try{
+                User user=  userDAO.getUserByField("username",data);
+
+                return ResponseEntity.ok(Map.of(
+                        "status", "success",
+                        "user",user));
+
+            }catch (Exception e){
+                throw new UserNotFoundException("User Doesnt Exist!");
+            }
+
         } else if (userField.equals("id")) {
             try{
                 User user=  userDAO.getUserByField("id",data);
@@ -286,8 +299,19 @@ public class WebService {
     public  double floorToNearestHalf(double number) {
         return Math.floor(number * 2) / 2.0;
     }
-    public ResponseEntity<?> createReview(Review review,int userId,int prodId){
+    public float getReviewRate(float prodRevRate,float currentRating,int nbOfReviews){
+        float newRate=0;
+
+        if(prodRevRate == 0){
+            newRate=currentRating;
+        }else{
+            newRate=(prodRevRate * nbOfReviews + currentRating) / (nbOfReviews + 1);
+        }
+        return (float) floorToNearestHalf(newRate);
+    }
+    public ResponseEntity<?> createReview(Review review,int userId,int prodId,int sellerId){
         User foundUser=userDAO.getUserById(userId);
+        User sellerUser=userDAO.getUserById(sellerId);
         if(foundUser == null){
             throw new UserNotFoundException("User Not Found");
         }
@@ -296,28 +320,23 @@ public class WebService {
             throw new ProductNotFoundException("Product Not Found");
         }
         review.setUser(foundUser);
+
         review.setProduct(prod);
         review.setCreatedAt(LocalDateTime.now());
 
-
-        float prodRevRate=prod.getReviewRates();
-        float newRate=0;
-
-        if(prodRevRate == 0){
-            newRate=review.getRating();
-        }else{
-            newRate=(prodRevRate * prod.getReviews().size() + review.getRating()) / (prod.getReviews().size() + 1);
-        }
-
-
-        prod.setReviewRates((float) floorToNearestHalf(newRate));
+        float prodNewRate=getReviewRate(prod.getReviewRates(),review.getRating(),prod.getReviews().size());
+        prod.setReviewRates(prodNewRate);
+        float sellerNewRate=getReviewRate(sellerUser.getReviewRates(),review.getRating(),sellerUser.getProdReviewed().size());
+        sellerUser.setReviewRates(sellerNewRate);
+        review.setSellerUser(sellerUser);
+        userDAO.updateUser(sellerUser);
         productDAO.updateProduct(prod);
         reviewRepository.save(review);
 
         return ResponseEntity.ok(Map.of(
                 "status", "success",
                 "review",review,
-                "prodNewRate",(float) floorToNearestHalf(newRate)
+                "prodNewRate",prodNewRate
                 ));
     }
 

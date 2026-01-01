@@ -1,6 +1,7 @@
 package com.example.ShopNow.Models.dao;
 
 import com.example.ShopNow.Models.Product;
+import com.example.ShopNow.Models.User;
 import com.example.ShopNow.Services.JsonReaderService;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
@@ -15,15 +16,17 @@ public class ProductDAOImp implements ProductDAO{
     @Autowired
     private JsonReaderService jsonReaderService;
     EntityManager entityManager;
-
+    public UserDAO userDAO;
     @Autowired
-    public  ProductDAOImp(EntityManager entityManager){
+    public  ProductDAOImp(EntityManager entityManager, UserDAO userDAO){
+
         this.entityManager=entityManager;
+        this.userDAO=userDAO;
     }
     @Transactional
     public List<Product> loadAllProducts() throws IOException {
         Map<String, String> productTypes = new HashMap<>();
-
+        Map<String, User> vendors = new HashMap<>();
         productTypes.put("gaming", "gaming");
         productTypes.put("desktop", "desktop");
         productTypes.put("pcComp", "computer-components");
@@ -41,6 +44,22 @@ public class ProductDAOImp implements ProductDAO{
         }
         for(Product prod: allProds){
             prod.setCreatedAt(LocalDateTime.now());
+            if(!vendors.containsKey(prod.getVendor())){
+                User seller=new User();
+                String sellerName=prod.getVendor();
+                seller.setUsername(sellerName);
+                seller.setEmail(sellerName+"@gmail.com");
+                seller.setPassword("12345678");
+                seller.setCreatedAt(LocalDateTime.now());
+                seller.setEnabled(1);
+                seller.setVendor(true);
+                userDAO.save(seller);
+                vendors.put(sellerName,seller);
+                prod.setSellerUser(seller);
+            }else{
+                prod.setSellerUser(vendors.get(prod.getVendor()));
+            }
+
             entityManager.persist(prod);
         }
         return  allProds;

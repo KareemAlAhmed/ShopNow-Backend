@@ -40,6 +40,52 @@ public class User {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
 
+
+
+    //Vendor
+    private float reviewRates;
+
+
+    @OneToMany(mappedBy = "sellerUser") // "parent" refers to the field in ChildEntity
+    private List<Product> sellingProds;
+
+    @OneToMany(mappedBy = "sellerUser") // "parent" refers to the field in ChildEntity
+    private List<Review> prodReviewed;
+    @Column(name = "isVendor")
+    private int isVendor=0;
+
+    public boolean isVendor() {
+        return isVendor != 0 ;
+    }
+
+    public void setVendor(boolean vendor) {
+        isVendor = vendor ? 1 : 0;
+    }
+
+    public float getReviewRates() {
+        return reviewRates;
+    }
+
+    public void setReviewRates(float reviewRates) {
+        this.reviewRates = reviewRates;
+    }
+
+    public List<Product> getSellingProds() {
+        return sellingProds;
+    }
+
+    public void setSellingProds(List<Product> sellingProds) {
+        this.sellingProds = sellingProds;
+    }
+
+    public List<Review> getProdReviewed() {
+        return prodReviewed;
+    }
+
+    public void setProdReviewed(List<Review> prodReviewed) {
+        this.prodReviewed = prodReviewed;
+    }
+
     public List<Review> getReviews() {
         return reviews;
     }

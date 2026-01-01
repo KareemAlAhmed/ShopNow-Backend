@@ -1,12 +1,9 @@
 package com.example.ShopNow.Models.dao;
 
-import com.example.ShopNow.Exceptions.InsufficientFundsException;
-import com.example.ShopNow.Models.CartItem;
 import com.example.ShopNow.Models.User;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -14,6 +11,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Repository
 public class UserDAOImp implements UserDAO {
@@ -55,7 +53,13 @@ public class UserDAOImp implements UserDAO {
                     .setParameter("username", user.getUsername())
                     .setParameter("authority", "ROLE_USER")
                     .executeUpdate();
-
+        if(user.isVendor()){
+            entityManager.createNativeQuery(
+                            "INSERT INTO authorities (username, authority) VALUES (:username, :authority)")
+                    .setParameter("username", user.getUsername())
+                    .setParameter("authority", "ROLE_VENDOR")
+                    .executeUpdate();
+        }
             return ResponseEntity.ok(Map.of(
                     "message", "User created successfully",
                     "status", "success",
@@ -90,6 +94,12 @@ public class UserDAOImp implements UserDAO {
 
     public List<User> getAllUser(){
         return entityManager.createQuery("FROM User ",User.class).getResultList();
+    }
+    public List<UserResponseDTO> getUsersSecured(){
+        List<User> users= entityManager.createQuery("FROM User ",User.class).getResultList();
+        return users.stream()
+                .map(UserResponseDTO::fromEntity)
+                .collect(Collectors.toList());
     }
 
     @Transactional

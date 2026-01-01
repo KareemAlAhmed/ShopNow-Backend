@@ -15,13 +15,26 @@ public class Review {
 
     @ManyToOne
     @JoinColumn(name = "user_id") // Foreign key column in the Book table
-    @JsonIgnoreProperties({"password", "cart", "wishlist", "purchases","reviews"})
+    @JsonIgnoreProperties({"password", "cart", "wishlist", "purchases","reviews","sellingProds","prodReviewed","funds"})
     private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "seller_user_id") // Foreign key column in the Book table
+    @JsonIgnoreProperties({"password", "cart", "wishlist", "purchases","reviews","sellingProds","prodReviewed","funds"})
+    private User sellerUser;
+
+    public User getSellerUser() {
+        return sellerUser;
+    }
+
+    public void setSellerUser(User sellerUser) {
+        this.sellerUser = sellerUser;
+    }
 
     @ManyToOne
     @JoinColumn(name = "product_id") // Foreign key column in the Book table
 //    @JsonIgnore
-    @JsonIgnoreProperties({"reviews","description","images_url","quantity","Images_url"})
+    @JsonIgnoreProperties({"reviews","description","images_url","quantity","Images_url","sellerUser"})
     private Product product;
 
     public Product getProduct() {

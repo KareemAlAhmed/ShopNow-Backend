@@ -3,6 +3,7 @@ package com.example.ShopNow.Models;
 
 import com.example.ShopNow.FlexibleStringListConverter;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
@@ -63,6 +64,21 @@ public class Product {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
 
+    private float reviewRates;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id") // Foreign key column in the Book table
+    @JsonIgnoreProperties({"password", "cart", "wishlist", "purchases","reviews","sellingProds","prodReviewed"})
+    private User sellerUser;
+
+    public User getSellerUser() {
+        return sellerUser;
+    }
+
+    public void setSellerUser(User sellerUser) {
+        this.sellerUser = sellerUser;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -79,7 +95,7 @@ public class Product {
         this.reviewRates = reviewRates;
     }
 
-    private float reviewRates;
+
     public List<Review> getReviews() {
         return reviews;
     }
