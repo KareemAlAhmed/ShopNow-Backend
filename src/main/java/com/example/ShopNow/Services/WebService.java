@@ -142,7 +142,7 @@ public class WebService {
             }
             prodsId.put(item.getId(),Integer.parseInt(item.getQuantity()));
         }
-        double finalCost=Math.round(totalCost + totalCost*0.7) ;
+        double finalCost=Math.round(totalCost + totalCost*0.07) ;
         Discount discount=new Discount();
         System.out.println(discountCode);
         if(discountCode == null){
@@ -180,6 +180,7 @@ public class WebService {
                     "updatedProds",prodsId));
     }
     public ResponseEntity<?> updateCartWish(User data){
+
         userDAO.updateCartWish(data);
         return ResponseEntity.ok(Map.of(
                 "status", "success"));

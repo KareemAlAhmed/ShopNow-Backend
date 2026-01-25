@@ -47,8 +47,10 @@ public class UserController {
     public List<UserDAO.UserResponseDTO> getUsersSecured() {
         return webService.getUsersSecured();
     }
+
     @PostMapping("/saveCartWish")
     public ResponseEntity<?> saveCartWish(@RequestBody User user){
+        System.out.println("hello");
         return webService.updateCartWish(user);
     }
 

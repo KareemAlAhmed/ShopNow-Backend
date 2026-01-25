@@ -104,6 +104,7 @@ public class UserDAOImp implements UserDAO {
 
     @Transactional
     public void updateCartWish( User data){
+        System.out.println(data.getCreatedAt());
         entityManager.merge(data);
     }
 

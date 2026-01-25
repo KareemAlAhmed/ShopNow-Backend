@@ -18,6 +18,8 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestParam;
+
 @Service
 public class ConversationService {
     private ConversationDAO conversationDAO;
@@ -107,21 +109,37 @@ public class ConversationService {
                     break;
                 }
             }
-//            Set<ConversationParticipant> parts=conversation.getParticipants();
-//            for (int i=0;i<parts.size();i++){
-//                if(parts.getUser().getId() == userId){
-//                    receiver=part;
-//                    break;
-//                }
-//            }
-
         }
-
-
         return ResponseEntity.ok(Map.of(
                 "status", "success",
                 "conversation",conversation));
     }
+
+    public ResponseEntity<?> deleteMsg(int msgId,int convId){
+        Conversation conv=conversationDAO.getConversationById(convId);
+        Message msg= messaageDAO.getMsgById(msgId);
+        boolean isConvUpdated=false;
+        if(conv.getLastMessage().equals(msg.getContent())){
+            conv.setLastMessage("Message is deleted");
+            conv.setLastMessageAt(LocalDateTime.now());
+            conversationDAO.updateConv(conv);
+            isConvUpdated=true;
+        }
+        msg.setContent("Message is deleted");
+
+        return ResponseEntity.ok(Map.of(
+                "status", "success",
+                "msg",messaageDAO.updateMsg(msg),
+                "isConvUpdated",isConvUpdated,
+                "conv",conv));
+    }
+    public ResponseEntity<?> deleteConvMessages(int convId){
+
+        messaageDAO.deleteConvMessages(convId);
+        return ResponseEntity.ok(Map.of(
+                "status", "success"));
+    }
+
     public ResponseEntity<?> createConversation(int user1Id,int user2Id){
         User user1=userDAO.getUserById(user1Id);
         User user2=userDAO.getUserById(user2Id);

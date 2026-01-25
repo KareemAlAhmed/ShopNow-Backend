@@ -37,4 +37,12 @@ public class ChatController {
     public ResponseEntity<?> createConversation(@RequestParam("user1_id")int user1Id,@RequestParam("user2_id")int user2Id){
         return conversationService.createConversation(user1Id,user2Id);
     }
+    @PutMapping("/deleteMsg")
+    public ResponseEntity<?> deleteConv(@RequestParam("msg_id")int msgId,@RequestParam("conv_id")int convId){
+        return conversationService.deleteMsg(msgId,convId);
+    }
+    @DeleteMapping("/deleteAllMsg")
+    public ResponseEntity<?> deleteConvMessages(@RequestParam("conv_id")int convId){
+        return conversationService.deleteConvMessages(convId);
+    }
 }

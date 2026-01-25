@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
 @Repository
 public class MessaageDAOImp implements MessaageDAO{
     EntityManager entityManager;
@@ -29,5 +31,24 @@ public class MessaageDAOImp implements MessaageDAO{
         msg.setType(msgType);
         entityManager.persist(msg);
         return msg;
+    }
+    public Message getMsgById(int msgId){
+
+        return entityManager.find(Message.class,msgId);
+    }
+    @Transactional
+    public Message updateMsg(Message msg){
+
+        return entityManager.merge(msg);
+    }
+
+    @Transactional
+    public void deleteConvMessages(int convId){
+
+        String jpql = "DELETE FROM Message WHERE conversation.id = :convId";
+
+        int deletedCount = entityManager.createQuery(jpql)
+                .setParameter("convId", convId)
+                .executeUpdate();
     }
 }

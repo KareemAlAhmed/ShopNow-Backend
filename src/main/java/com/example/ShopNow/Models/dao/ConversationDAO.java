@@ -10,4 +10,5 @@ public interface ConversationDAO {
     public Conversation getConversationFromUsers(int user1,int user2);
     public Conversation updateConv(Conversation conv);
 
+
 }
